@@ -16,6 +16,9 @@ public class Brett {
                 ruter[rad][kolonne] = new Rute(rad, kolonne);
             }
         }
+        for (int i = 0; i < 3; i++){
+            opprettMat();
+        }
     }
 
     public void opprettMat(){
@@ -23,8 +26,9 @@ public class Brett {
         while(true){
             rad = (int) (Math.random() * ANTALL_RADER);
             kolonne = (int) (Math.random() * ANTALL_KOLONNER);
-            if (ruter[rad][kolonne].ruteType != RuteType.HODE){break;}
+            if (ruter[rad][kolonne].ruteType != RuteType.KROPP){break;}
         }
+        System.out.println("Mat laget på [" + rad + "," + kolonne + "]");
         ruter[rad][kolonne].ruteType = RuteType.PANT;
     }
 

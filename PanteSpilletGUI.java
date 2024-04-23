@@ -2,23 +2,23 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Timer;
-
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 
 public class PanteSpilletGUI extends JFrame{
     
-    final int RUTE_DIMENSJON = 20;
+    final int RUTE_DIMENSJON = 40;
 
     Kontroller kontroller;
     SpillRute[][] ruter;
@@ -26,12 +26,12 @@ public class PanteSpilletGUI extends JFrame{
     JLabel antallPant;
     private static final int spillDelay = 2000;
 
+    ImageIcon panteIkon;
+
     PanteSpilletGUI(
         Kontroller kontroller
     ){
-        
-        this.kontroller = kontroller;
-
+        //super();
         try {
             UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName()
@@ -40,6 +40,10 @@ public class PanteSpilletGUI extends JFrame{
             System.exit(1);
         }
 
+        this.kontroller = kontroller;
+        antallPant = new JLabel(
+            kontroller.hentAntallPant()
+        );
         rutenett = new SpillPanel();
         rutenett.setLayout(
             new GridLayout(
@@ -47,6 +51,11 @@ public class PanteSpilletGUI extends JFrame{
                 kontroller.ANTALL_KOLONNER 
                 )
             );
+        
+        // Skalere panteikonet
+        panteIkon = new ImageIcon("panteIkon.jpeg");
+        Image skalertPanteIkon = panteIkon.getImage().getScaledInstance(RUTE_DIMENSJON, RUTE_DIMENSJON, Image.SCALE_SMOOTH);
+        panteIkon = new ImageIcon(skalertPanteIkon);
 
         ruter = new SpillRute[kontroller.ANTALL_RADER][kontroller.ANTALL_KOLONNER];
 
@@ -60,58 +69,43 @@ public class PanteSpilletGUI extends JFrame{
             }
         }
 
+        // Legge til komponenter på tegneflaten
+        add(
+            antallPant,
+            BorderLayout.NORTH
+        );
+
         add(
             rutenett,
-            BorderLayout.CENTER
+            BorderLayout.SOUTH
             );
+
+        // Pakke og sette egenskaper til vinduet
         pack();
         setResizable(true);
         setLocationRelativeTo(null);
         setVisible(true);
         setName("PanteSpillet");
-
-        spill();
-
-    }
-
-    void spill(){
-
-        kontroller.start();
-
-        kontroller.settHode(
-            kontroller.ANTALL_RADER / 2,
-            kontroller.ANTALL_KOLONNER / 2
-        );
-
-        new Thread(
-            () -> {
-                while (kontroller.kjorer()){
-                    try {
-                        Thread.sleep(spillDelay);
-                        SwingUtilities.invokeLater(
-                        () -> {
-                            oppdater();
-                        }
-                    );
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-
-                }
-            }
-        ).start();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     void oppdater(){
-        kontroller.oppdater();
         tegnAlleRuter();  
     }
 
     void tegnRute(SpillRute rute){
-        if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.HODE){rute.setBackground(SpillFarger.HODE);}
-        if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.TOM){rute.setBackground(SpillFarger.TOM);}
-        if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.PANT){rute.setBackground(SpillFarger.PANT);}
-        kontroller.oppdater();
+        if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.KROPP){
+            rute.setBackground(SpillFarger.KROPP);
+            rute.setIcon(null);
+        }
+        if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.TOM){
+            rute.setBackground(SpillFarger.TOM);
+            rute.setIcon(null);
+        }
+        if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.PANT){
+            rute.setBackground(SpillFarger.PANT);
+            rute.setIcon(panteIkon);
+        }
     }
 
     void tegnAlleRuter(){
@@ -124,17 +118,25 @@ public class PanteSpilletGUI extends JFrame{
     }   
 
     private void tegnAntallPant(){
+        antallPant.setText("Pant samlet: " + kontroller.hentAntallPant());
+    }
 
+    public void visTaperMelding(){
+        JOptionPane.showMessageDialog(
+            rootPane,
+            "UPS, DU TAPTE!"
+            );
     }
 
     class SpillRute extends JLabel{
 
         int rad, kolonne;
         public SpillRute(int rad, int kolonne){
+            super("", SwingConstants.CENTER);
             this.rad = rad;
             this.kolonne = kolonne;
             this.setPreferredSize(new Dimension(RUTE_DIMENSJON, RUTE_DIMENSJON));
-            this.setBackground(SpillFarger.BAKGRUNN);
+            this.setBackground(SpillFarger.TOM);
             this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
             this.setOpaque(true);
         }
@@ -151,8 +153,7 @@ public class PanteSpilletGUI extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
+
         }
 
         @Override
@@ -167,14 +168,12 @@ public class PanteSpilletGUI extends JFrame{
 
         @Override
         public void keyTyped(KeyEvent e) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'keyTyped'");
+
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'keyReleased'");
+
         }
 
         

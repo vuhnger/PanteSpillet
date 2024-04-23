@@ -17,6 +17,7 @@ public class Modell {
         this.brett = brett;
         this.kontroller = kontroller;
         antallPant = 0;
+        spillFerdig = false;
     }
 
     void oppdater(){
@@ -36,13 +37,20 @@ public class Modell {
         return;
        }
 
-       slange.flytt(neste);
-       if (neste.ruteType == RuteType.PANT){
-        slange.voks();
-        antallPant++;
-        brett.opprettMat();
-       }
-       kontroller.oppdater();
+       System.out.println(
+        "Denne : " +  slange.hode.rad + " " + slange.hode.kolonne + 
+        "\nNeste: " + neste.ruteType + " " + neste.rad + " " + neste.kolonne
+        );
+
+        
+        if (neste.ruteType == RuteType.PANT){
+            System.out.println("Generer pant.");
+            slange.voks();
+            antallPant++;
+            brett.opprettMat();
+        }
+
+        slange.flytt(neste);
     }
 
     Rute hentNesteRute(Rute posisjon){
@@ -51,8 +59,13 @@ public class Modell {
 
         if (retning == Retning.RETNING_HOYRE){kolonne++;}
         if (retning == Retning.RETNING_VENSTRE){kolonne--;}
-        if (retning == Retning.RETNING_OPP){rad++;}
-        if (retning == Retning.RETNING_NED){rad--;}
+        if (retning == Retning.RETNING_OPP){rad--;}
+        if (retning == Retning.RETNING_NED){rad++;}
+
+        // Slangen kjorer inn på brettet fra andre siden
+        rad = (rad + brett.ANTALL_RADER) % brett.ANTALL_RADER;
+        kolonne = (kolonne + brett.ANTALL_KOLONNER) % brett.ANTALL_KOLONNER;
+
         return brett.ruter[rad][kolonne];
     }   
 

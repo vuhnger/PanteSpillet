@@ -8,7 +8,7 @@ public class Slange {
     public Slange(Rute startPosisjon){
         hode = startPosisjon;
         slangeDeler.add(hode);
-        hode.ruteType = RuteType.HODE;
+        hode.ruteType = RuteType.KROPP;
     }
 
     public void voks(){
@@ -20,7 +20,7 @@ public class Slange {
         hale.ruteType = RuteType.TOM;
 
         hode = neste;
-        hode.ruteType = RuteType.HODE;
+        hode.ruteType = RuteType.KROPP;
         slangeDeler.addFirst(hode);
     }
 
