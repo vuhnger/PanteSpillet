@@ -1,12 +1,14 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Random;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -23,10 +25,10 @@ public class PanteSpilletGUI extends JFrame{
     Kontroller kontroller;
     SpillRute[][] ruter;
     SpillPanel rutenett;
+    JPanel spillInfo;
     JLabel antallPant;
-    private static final int spillDelay = 2000;
 
-    ImageIcon panteIkon;
+    ImageIcon[] panteIkoner;
 
     PanteSpilletGUI(
         Kontroller kontroller
@@ -41,9 +43,6 @@ public class PanteSpilletGUI extends JFrame{
         }
 
         this.kontroller = kontroller;
-        antallPant = new JLabel(
-            kontroller.hentAntallPant()
-        );
         rutenett = new SpillPanel();
         rutenett.setLayout(
             new GridLayout(
@@ -51,11 +50,12 @@ public class PanteSpilletGUI extends JFrame{
                 kontroller.ANTALL_KOLONNER 
                 )
             );
-        
-        // Skalere panteikonet
-        panteIkon = new ImageIcon("panteIkon.jpeg");
-        Image skalertPanteIkon = panteIkon.getImage().getScaledInstance(RUTE_DIMENSJON, RUTE_DIMENSJON, Image.SCALE_SMOOTH);
-        panteIkon = new ImageIcon(skalertPanteIkon);
+
+        panteIkoner = new ImageIcon[]{
+            new ImageIcon(new ImageIcon("panteIkon.jpeg").getImage().getScaledInstance(RUTE_DIMENSJON, RUTE_DIMENSJON, Image.SCALE_SMOOTH)),
+            new ImageIcon(new ImageIcon("tuborg_ikon.jpeg").getImage().getScaledInstance(RUTE_DIMENSJON, RUTE_DIMENSJON, Image.SCALE_SMOOTH)),
+            new ImageIcon(new ImageIcon("cola_ikon.jpeg").getImage().getScaledInstance(RUTE_DIMENSJON, RUTE_DIMENSJON, Image.SCALE_SMOOTH))
+        };
 
         ruter = new SpillRute[kontroller.ANTALL_RADER][kontroller.ANTALL_KOLONNER];
 
@@ -70,8 +70,9 @@ public class PanteSpilletGUI extends JFrame{
         }
 
         // Legge til komponenter på tegneflaten
+
         add(
-            antallPant,
+            panteSpillTekst(),
             BorderLayout.NORTH
         );
 
@@ -85,7 +86,8 @@ public class PanteSpilletGUI extends JFrame{
         setResizable(true);
         setLocationRelativeTo(null);
         setVisible(true);
-        setName("PanteSpillet");
+        setTitle("Pantespillet");
+        setName("Pantespillet");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -104,7 +106,9 @@ public class PanteSpilletGUI extends JFrame{
         }
         if (kontroller.hentRute(rute.rad, rute.kolonne).ruteType == RuteType.PANT){
             rute.setBackground(SpillFarger.PANT);
-            rute.setIcon(panteIkon);
+            rute.setIcon(
+                panteIkoner[(int)((Math.random() * (3 - 0))+0)] // TODO: Oppdatere ikone sjeldnere
+            );
         }
     }
 
@@ -114,11 +118,11 @@ public class PanteSpilletGUI extends JFrame{
                 tegnRute(ruter[rad][kolonne]);
             }
         }
-        tegnAntallPant();
+        tegnSpillTekst();
     }   
 
-    private void tegnAntallPant(){
-        antallPant.setText("Pant samlet: " + kontroller.hentAntallPant());
+    private void tegnSpillTekst(){
+        antallPant.setText("PANT: " + kontroller.hentAntallPant());
     }
 
     public void visTaperMelding(){
@@ -137,7 +141,7 @@ public class PanteSpilletGUI extends JFrame{
             this.kolonne = kolonne;
             this.setPreferredSize(new Dimension(RUTE_DIMENSJON, RUTE_DIMENSJON));
             this.setBackground(SpillFarger.TOM);
-            this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            this.setBorder(BorderFactory.createLineBorder(SpillFarger.RUTE_KANT));
             this.setOpaque(true);
         }
 
@@ -175,9 +179,28 @@ public class PanteSpilletGUI extends JFrame{
         public void keyReleased(KeyEvent e) {
 
         }
-
-        
     }
 
+    private JPanel panteSpillTekst(){
+        System.out.println("Tegnet info" + kontroller.hentAntallPant());
+
+        final Font FONT_STOR = new Font(Font.SANS_SERIF, Font.BOLD, 40);
+        final Font FONT_LITEN = new Font(Font.SANS_SERIF, Font.BOLD, 20);
+
+        JPanel spillTekst = new JPanel();
+        spillTekst.setLayout(new BorderLayout());
+        spillTekst.setBackground(SpillFarger.TOM);
+
+        JLabel tittel = new JLabel("Pantespillet");
+        tittel.setFont(FONT_STOR);
+        tittel.setForeground(SpillFarger.TEKST);
+        spillTekst.add(tittel, BorderLayout.LINE_START);
+
+        antallPant = new JLabel("PANT: " + kontroller.hentAntallPant(), SwingConstants.CENTER);
+        antallPant.setFont(FONT_LITEN);
+        antallPant.setForeground(SpillFarger.TEKST);
+        spillTekst.add(antallPant);
+        return spillTekst;
+    }
 
 }
