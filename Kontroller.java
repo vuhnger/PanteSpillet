@@ -4,7 +4,7 @@ public class Kontroller{
     final int ANTALL_RADER, ANTALL_KOLONNER;
     final PanteSpilletGUI view;
     final Modell modell;
-    final int SPILL_DELAY_TID = 100;
+    final int SPILL_DELAY_TID = 50;
 
     public Kontroller(int antallRader, int antallKolonner){
         this.ANTALL_RADER = antallRader;
@@ -59,13 +59,24 @@ public class Kontroller{
     void settRetning(int retning){
         modell.retning = retning;
     }
+
+    String hentNivaa(){
+        return modell.hentNivaa();
+    }
     
     public static void main(String[] args) {
 
         if (args.length < 2){
             new Kontroller(10, 20);
+        }{
+            new Kontroller(
+                Integer.parseInt(args[0]),
+                Integer.parseInt(args[1])
+                );
         }
         
     }
+
+
 
 }

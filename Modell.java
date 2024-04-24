@@ -18,6 +18,17 @@ public class Modell {
         this.kontroller = kontroller;
         antallPant = 0;
         spillFerdig = false;
+        
+    }
+
+    String hentNivaa(){
+        if (antallPant > 4 && antallPant < 10) return "PanteSamler";
+        if (antallPant > 9 && antallPant < 15) return "Pantemannen";
+        if (antallPant > 14 && antallPant < 20) return "KIRURGEN!";
+        if (antallPant > 19 && antallPant < 25) return "PANT OVERLORD!!";
+        if (antallPant > 24 && antallPant < 30) return "RICH GUY DONT PANT!!!";
+        if (antallPant > 29 && antallPant < 35) return "PANTEMONARK!!!!";;
+        return "IFI-Student"; 
     }
 
     void oppdater(){

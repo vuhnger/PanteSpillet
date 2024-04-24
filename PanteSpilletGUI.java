@@ -26,14 +26,13 @@ public class PanteSpilletGUI extends JFrame{
     SpillRute[][] ruter;
     SpillPanel rutenett;
     JPanel spillInfo;
-    JLabel antallPant;
+    JLabel antallPant, panteNivaa;
 
     ImageIcon[] panteIkoner;
 
     PanteSpilletGUI(
         Kontroller kontroller
     ){
-        //super();
         try {
             UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName()
@@ -123,12 +122,15 @@ public class PanteSpilletGUI extends JFrame{
 
     private void tegnSpillTekst(){
         antallPant.setText("PANT: " + kontroller.hentAntallPant());
+        panteNivaa.setText("NIVÅ: " + kontroller.hentNivaa());
     }
 
     public void visTaperMelding(){
         JOptionPane.showMessageDialog(
             rootPane,
             "UPS, DU TAPTE!"
+            + "\nDU SAMLET " + kontroller.hentAntallPant() + " PANT"
+            + "\nOG NÅDDE NIVÅ " + kontroller.hentNivaa()
             );
     }
 
@@ -189,17 +191,32 @@ public class PanteSpilletGUI extends JFrame{
 
         JPanel spillTekst = new JPanel();
         spillTekst.setLayout(new BorderLayout());
-        spillTekst.setBackground(SpillFarger.TOM);
+        spillTekst.setBackground(SpillFarger.BAKGRUNN);
 
-        JLabel tittel = new JLabel("Pantespillet");
+        JLabel tittel = new JLabel(
+            "Pantespillet"
+            );
         tittel.setFont(FONT_STOR);
         tittel.setForeground(SpillFarger.TEKST);
-        spillTekst.add(tittel, BorderLayout.LINE_START);
+        spillTekst.add(tittel, BorderLayout.EAST);
 
-        antallPant = new JLabel("PANT: " + kontroller.hentAntallPant(), SwingConstants.CENTER);
+        antallPant = new JLabel(
+            "PANT: " + kontroller.hentAntallPant(),
+            SwingConstants.CENTER
+            );
         antallPant.setFont(FONT_LITEN);
         antallPant.setForeground(SpillFarger.TEKST);
-        spillTekst.add(antallPant);
+        spillTekst.add(antallPant, BorderLayout.CENTER);
+
+        panteNivaa = new JLabel(
+            "NIVÅ: " + kontroller.hentNivaa(),
+            SwingConstants.CENTER
+        );
+        panteNivaa.setFont(FONT_LITEN);
+        panteNivaa.setForeground(SpillFarger.TEKST);
+        spillTekst.add(panteNivaa, BorderLayout.WEST);
+        
+
         return spillTekst;
     }
 
